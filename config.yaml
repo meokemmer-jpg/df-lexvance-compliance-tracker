@@ -1,0 +1,157 @@
+# DF-LEXVANCE-COMPLIANCE-TRACKER Configuration [CRUX-MK]
+# Welle-48 Track-A Wave-1 DC-1 Foundation-DF (Gap-Cluster A)
+# GDPR + AI-Act + GwG + BRAO + StBerG Compliance-Tracking
+
+df_id: DF-LEXVANCE-COMPLIANCE-TRACKER
+df_name: lexvance-compliance-tracker
+version: 0.1.0-SKELETON
+status: SKELETON-CONDITIONAL
+crux-mk: true
+
+description: |
+  Compliance-Tracker fuer GDPR (Art. 6/9/32) + EU AI-Act (Annex-III-Risiko-
+  Klassifikation) + GwG (Mandanten-Screening + PEP-Checks) + BRAO + StBerG.
+  Pro Mandant: Compliance-Check + Risk-Score (LOW/MED/HIGH) + Eskalation bei
+  HIGH-Risk. ENV-Var-gated Default-Disabled.
+
+# === Default-Action (per ausreden-schutz.md Schicht 2) ===
+
+default_action:
+  description: "Pro Mandant Compliance-Pruefung (GDPR + AI-Act + GwG + BRAO) mit Risk-Score + Eskalation bei HIGH"
+  rho_per_run_eur: 200
+  block_gates:
+    - gate_id: K13_PAV
+      block_reason: "Mandanten-Daten = Q_0-naehe, PHRONESIS_TICKET Martin Pflicht"
+      false_block_cost_eur: 500
+      legitimate_block_condition: "Production-Mode aktiv UND PHRONESIS_TICKET fehlt"
+    - gate_id: K11
+      block_reason: "Mandanten-Cross-Read verboten ohne Tenant-Isolation"
+      false_block_cost_eur: 200
+      legitimate_block_condition: "Tenant-Context fehlt"
+  graceful_degradation_path: "Mock-Compliance-Check mit standard-Risk-Score=MED"
+
+# === Tier-2 Pflicht-Check ===
+
+tier_2_check:
+  lambda_per_month_estimate: 30  # ~1/Tag pro Mandant
+  narrow_scope: "Compliance-Check 4 Bereiche (GDPR/AI-Act/GwG/Berufsrecht) mit fixen Pruefkatalog"
+  determinism: 0.85  # Pruefkatalog deterministisch, Risk-Scoring parametrisch
+  rollback_seconds: 30
+  test_coverage_target: 0.85
+  k0_protected: true
+  q0_measurable: true
+  escalation_after_n_fails: 3
+  rho_budget_eur_day: 5
+  audit_trail: branch-hub/audit/df-lexvance-compliance-tracker.jsonl
+
+# === K11-K16 ===
+
+k11_cascade_containment:
+  cascade_isolation: hard
+  failure_blast_radius: 1
+  dependency_dlq_strategy: "skip-mandant-resume-naechster + jsonl-log"
+
+k12_distillation_resistenz:
+  output_feeds_into_training: false
+  provenance_required_in_output: true
+  non_llm_validation_layer: "Pruefkatalog-Vollstaendigkeits-Check (alle 4 Bereiche) + Risk-Score-Bandbreite [0.0-1.0]"
+
+k13_independent_ground_truth:
+  external_anchor_type: "regulatory_text_corpus + github_api"
+  external_anchor_validation_frequency: "monatlich (Pruefkatalog-Refresh)"
+  pre_action_domain_check:
+    env_tag: "dev|staging|prod via DF_LEXVANCE_COMPLIANCE_ENV"
+    mount_point: "branch-hub/lexvance/mandanten/ + Pruefkatalog-Files"
+    network_region: "n/a"
+  pre_action_backup_check:
+    backup_status: "Mandanten-Daten read-only (kein Mutation)"
+    replication_lag: "n/a"
+  pre_action_blast_radius_check:
+    blast_radius: "max 1 Mandant pro Run (read-only)"
+    reversibility_class: "state-only"
+
+k14_human_override_decay:
+  override_complexity: requires_specialist  # K_0/Q_0-Naehe: nur Martin + LexVance
+  override_documentation_freshness_days: 7
+  martin_review_cadence: pro HIGH-Risk-Eskalation
+  bus_factor_handover_drilled: false
+
+k15_entropy_budget:
+  entropy_added_loc_estimate: 250
+  entropy_added_concepts:
+    - ComplianceChecker
+    - RiskScorer
+    - PruefkatalogLoader
+    - EskalationsManager
+  entropy_justified_by_rho: "3.0x (manuelle Compliance-Pruefung pro Mandant ~2h x 220 EUR x 30/Mo = 13k/Mo)"
+  entropy_subtractive_potential: "ersetzt manuelle Compliance-Checklist"
+
+k16_concurrent_spawn_mutex:
+  concurrent_spawn_protection: both
+  lock_dir: /tmp/df-lexvance-compliance-tracker.lock
+  lock_stale_age_h: 6
+  engine_pgrep_check: true
+  lock_release_on: EXIT_INT_TERM
+
+# === LC1-LC5 ===
+
+lose_coupling:
+  LC1_graceful_degradation:
+    degradation_modes:
+      - full              # alle 4 Bereiche pruefbar
+      - degraded_ai_act   # AI-Act-Pruefkatalog fehlt (3 Bereiche aktiv)
+      - degraded_gwg      # GwG-PEP-Liste nicht erreichbar (3 Bereiche aktiv)
+      - standalone        # Mock-Pruefung mit standard-Risk-Score=MED
+    degradation_test_required: true
+
+  LC2_direct_mode:
+    direct_mode_available: true
+    direct_mode_capability: 0.75
+    direct_mode_trigger: "Pruefkatalog-File-Fehler oder External-API-Timeout"
+
+  LC3_circuit_breaker:
+    circuit_breaker_timeout_s: 30
+    circuit_breaker_open_threshold: 3
+    circuit_breaker_half_open_test_interval_s: 300
+
+  LC4_failure_isolation:
+    state_externalization: true
+    idempotent_operations: true
+    dependency_dlq_separate: true
+
+  LC5_health_check:
+    health_check_dependencies: []
+    health_check_degraded_score: 0.6
+    health_check_endpoint_or_file: /tmp/df-lexvance-compliance-tracker-health.json
+
+# === ENV-Var-Gated Real-Integration (per env-var-gated-real-integration-default.md) ===
+
+env_var_gating:
+  DF_LEXVANCE_COMPLIANCE_REAL_ENABLED: false  # Default Mock
+  PHRONESIS_TICKET_REQUIRED: true              # bei Real-Mode Pflicht
+  default_mode: mock
+
+# === Operatives ===
+
+operations:
+  output_path: ~/Projects/dark-factories/df-lexvance-compliance-tracker/
+  state_file: ~/.df-lexvance-compliance-tracker/state.json
+  jsonl_audit_path: branch-hub/audit/df-lexvance-compliance-tracker.jsonl
+  stop_flag_path: /tmp/df-lexvance-compliance-tracker.stop
+  health_file_path: /tmp/df-lexvance-compliance-tracker-health.json
+  schedule: "Continuous (per Mandant on-demand)"
+
+# === rho-Schaetzung ===
+
+rho_estimate:
+  annual_eur: 120000
+  reason: "GDPR-Bussgeld-Vermeidung (max 4% Umsatz) + AI-Act-Conformity + GwG-Pflicht-Compliance"
+  schwer_quantifizierbar: true  # Risk-Vermeidung schwer zu beziffern
+
+# === CRUX-Bindung ===
+
+crux_bindung:
+  K_0: "DIREKT GESCHUETZT (Bussgeld-Vermeidung GDPR/AI-Act/GwG)"
+  Q_0: "epistemische Integritaet (Pruefkatalog-Vollstaendigkeit)"
+  I_min: "strukturierte 4-Bereiche-Pipeline (250 LOC + Tests)"
+  W_0: "Anwalts-Stundenzahl LexVance reduziert via Pre-Filter"
