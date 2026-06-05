@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 # K12+K13+K16 Trinity-CONTRARIAN 2026-05-17 (Cross-LLM-validated)
 def k12_provenance(payload: bytes, key: bytes = b"df-trinity-contrarian-v1") -> dict:
@@ -37,6 +36,7 @@ Pre/Post-Conditions:
 - Pre: mandant_id (str, required), pruef_bereiche (list optional, default alle 4)
 - Post: ComplianceResult mit source ("mock"|"real-api"), risk_score [0.0-1.0], findings_count
 """
+from __future__ import annotations
 
 import os
 import json
