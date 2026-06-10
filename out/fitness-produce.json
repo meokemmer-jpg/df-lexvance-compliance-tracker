@@ -1,9 +1,9 @@
 {
   "df": "df-lexvance-compliance-tracker",
-  "ts": "2026-06-09T02:14:01.201174+00:00",
+  "ts": "2026-06-09T15:54:44.720949+00:00",
   "ok": true,
-  "bytes": 5924,
+  "bytes": 1545,
   "model": "kemmer-14b-ctx8k",
   "mode": "produce",
-  "duration_s": 45.7
+  "duration_s": 32.3
 }

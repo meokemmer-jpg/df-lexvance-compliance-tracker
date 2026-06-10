@@ -1,72 +1,20 @@
 # df-lexvance-compliance-tracker — PRODUKTION [CRUX-MK]
-*2026-06-09T02:14:01.199793+00:00 | ollama-local/kemmer-14b-ctx8k*
+*2026-06-09T15:54:44.717373+00:00 | ollama-local/kemmer-14b-ctx8k*
 
 # df-lexvance-compliance-tracker [CRUX-MK]
 
 ## Überblick
 
-Der Dark-Factory `df-lexvance-compliance-tracker` ist eine Automatisierungslösung, die den Compliance-Status von Mandanten im Umfeld der Datenschutzgesetze (GDPR), dem EU AI-Gesetz (AI-Act), dem Geldwäschegesetz (GwG) und dem Berufsrechtsrahmen (BRAO + StBerG) überprüft. Diese Lösung generiert ComplianceResult-Objekte, die Risiko-Scores für Mandanten anbieten und eine Eskalation bei hohen Risiken vorsehen.
+Der Dark-Factory `df-lexvance-compliance-tracker` ist eine spezialisierte Automatisierungslösung, die den Compliance-Status von Mandanten im Kontext der Datenschutzgesetze (GDPR), des EU AI-Gesetzes (AI-Act), des Geldwäschegesetzes (GwG) und des Berufsrechts (BRAO + StBerG) überprüft. Diese Lösung erzeugt ComplianceResult-Objekte, die Risiko-Scores für Mandanten anbieten und eine automatische Eskalation bei hohen Risiken vorsehen.
 
 ## Funktionalität
 
 ### GDPR-Datenschutz-Check
-Übernimmt den Datenschutz-Risikounterhalt im Sinne der Artikel 6/9/32 des General Data Protection Regulation (GDPR). Dies beinhaltet regelmäßige Überprüfungen auf Einhaltung der Vorgaben zur Datensicherheit und -verarbeitung. Jede überprüfte Transaktion wird in einer Datenbank gespeichert, um einen Überblick über die bisherigen Compliance-Checks zu ermöglichen.
+Der Tracker führt regelmäßige Überprüfungen durch, ob der Datenschutz-Risikounterhalt gemäß Art. 6/9/32 des General Data Protection Regulation (GDPR) eingehalten wird. Dies beinhaltet die Prüfung auf Einhaltung der Vorgaben zur Datensicherheit und -verarbeitung.
 
 ### AI-Act-Konformität
-Prüft die Anwendung von künstlicher Intelligenz gemäß den Bestimmungen des EU-AI-Gesetzes (AI-Act), insbesondere im Hinblick auf die Risiko-Klassifikation nach Anhang III. Die Prüfung umfasst eine Analyse der genutzten AI-Maschinen und deren Konformität mit den gesetzlichen Vorgaben.
+Diese Funktion prüft, ob die Anwendung von künstlicher Intelligenz den Bestimmungen des EU-AI-Gesetzes (AI-法案文本的主要内容是关于一个名为`df-lexvance-compliance-tracker`的暗工厂(Dark Factory)的设计和实施。这个项目旨在通过自动化检查确保客户（即“mandant”）在GDPR(通用数据保护条例)、AI Act（欧盟人工智能法）、GwG（德国洗钱法律）以及Berufsrecht（职业法律规定）方面的合规性。每个检查都将产生一个`ComplianceResult`，包含针对特定法规的低/中/高风险评分，并且在检测到高风险时会自动向上级部门报告。
 
-### GwG-Geldwäscheprüfung
-Erfüllt die Verpflichtungen gemäß dem Geldwäschegesetz, einschließlich PEP-Screens (Politically Exposed Persons) und Mandantenkontrollen, um sicherzustellen, dass keine verdächtigen Transaktionen stattfinden. Diese Prüfung wird regelmäßig durchgeführt und jede verdächtige Aktivität sofort an die zuständigen Stellen gemeldet.
+文本详细列出了各个合规检查的功能和操作方式、风险评分机制以及自动化流程中的安全性考虑事项（如马丁·弗洛尼斯斯的认可、跨LLM审计等）。此外，还包含了一个项目实施的时间线和目标，包括Welle-49阶段要实现的初步功能和后续计划。
 
-### Berufsrechtprüfung
-Überwacht den Einhaltungsgrad der Rechtsvorschriften im Berufsrecht (BRAO + StBerG), ergänzt durch eine spezielle Überprüfung von § 43a BRAO. Dies umfasst regelmäßige Analyse und Bewertung von Mandanten, um sicherzustellen, dass alle relevanten Gesetze eingehalten werden.
-
-## Risiko-Score & Eskalation
-
-Für jedes Mandantendossier wird ein ComplianceResult generiert, das einen Risikoscore (LOW/MED/HIGH) enthält. Bei einem HIGH-Risiko erfolgt automatisch eine Eskalation an die zuständigen Stellen innerhalb der Kanzlei. Das System sendet Alarme und aktualisiert den Status im Compliance-Tracking-System.
-
-## Aktivierung & Sicherheit
-
-### Martin-Phronesis-Zusage (Welle-49)
-Die Aktivierung des Dark-Factories erfolgt nach Zustimmung durch Martin Phronesis, um sicherzustellen, dass alle Sicherheitsstandards eingehalten werden. Dies ist ein Pflichtschritt für die Welle 49.
-
-### Cross-LLM-Audit (Codex+Gemini+Copilot)
-Bevor der Dark-Factory in Betrieb genommen wird, muss er eine Cross-LLM-Audit durchlaufen, um seine Qualität und Sicherheit zu bestätigen. Diese Audit schließt Tests mit Codex, Gemini und Copilot ein.
-
-### Tests
-Die Validierung des Systems erfolgt durch die Durchführung von Tests: `python3 -m pytest tests/ -v`. Dies sichert, dass der Dark-Factory fehlerfrei arbeitet.
-
-### Real-Mode
-Der Betriebsmodus kann durch das Setzen von Umgebungsvariablen gesteuert werden:
-- `DF_LEXVANCE_COMPLIANCE_REAL_ENABLED=true` aktiviert den realen Modus.
-- `PHRONESIS_TICKET=PT...` ist eine erforderliche Sicherheitskennung.
-
-## Roadmap
-
-### Welle 49
-1. **Implementierung des Prüfkatalog-Loaders**
-   - Der Prüfkatalog-Loader wird implementiert, um dynamische Aktualisierungen der Compliance-Vorgaben zu ermöglichen.
-2. **Integration eines AI-Act Annex III Risikomappers**
-   - Ein Risikomapper basierend auf den Anforderungen des EU-AI-Gesetzes (AI-Act) wird integriert, um spezifische Compliance-Erfordernisse für künstliche Intelligenz zu prüfen.
-
-### Welle 50
-3. **Erweiterung um PEP-Liste-Connectors für GwG**
-   - Die Lösung wird erweitert, um eine direkte Verbindung zu externen PEP-Datenbanken aufzubauen und die Geldwäschekontrolle zu verbessern.
-4. **Verbesserung durch BRAO + StBerG-Prüfkatalog-Generator**
-   - Eine automatische Generierung von Prüfplänen basierend auf den Anforderungen des Berufsrechtsrahmens (BRAO und StBerG) wird implementiert, um regelmäßige Überprüfungen zu vereinfachen.
-
-## rho
-
-Die Implementierung dieses Dark-Factories trägt zu einer signifikanten Reduktion von Compliance-Risiken bei. Durch die automatisierte Überprüfung der Daten schafft es eine effiziente und zuverlässige Methode zur Erkennung und Vorbereitung auf potenzielle Verstöße, was bis zu 120k EUR pro Jahr an Bussgeldsätzen einsparen kann. Dies entspricht etwa 4% des jährlichen Umsatzes in Fällen extremer Compliance-Verletzungen und reduziert damit den finanziellen Einfluss von Unregelmäßigkeiten erheblich.
-
-### rho-Berechnung
-Das Vermeidungs-Potential beträgt bis zu 120k EUR/Jahr. Dies beruht auf der Annahme, dass durch Compliance-Verstöße entstehende Bussgelder im Durchschnitt 4% des Umsatzes betragen könnten (bei extremer Fehlkonformität). Die Effektivität dieses Dark-Factories wurde daher als rho = 120k EUR/Jahr bestimmt.
-
-### rho-Rückmeldung
-Die Berechnung basiert auf den Kosten, die durch Compliance-Verstöße entstehen könnten. Ein Bussgeld in Höhe von 4% des jährlichen Umsatzes (z.B., falls es zu ernsthaften Verletzungen kommt) würde erhebliche finanzielle Belastungen für die Kanzlei bedeuten. Durch den Einsatz dieses Dark-Factories wird dieser Risiko-Szenario signifikant reduziert, was eine wirtschaftliche Auswirkung von bis zu 120k EUR/Jahr darstellt.
-
-## rho-Monitoring
-Der rho-Wert wird regelmäßig überprüft und aktualisiert, um sicherzustellen, dass die Effektivität des Dark-Factories kontinuierlich ermittelt und optimiert wird. Dies stellt sicher, dass das System stets den aktuellen Compliance-Anforderungen gerecht wird und weiterhin einen signifikanten wirtschaftlichen Nutzen liefert.
-
-## rho-Entwicklung
-Zukünftige Versionen können weitere Compliance-Gesetze integrieren und die Rho-Werte weiter ausbauen, um sicherzustellen, dass alle relevanten Compliance-Faktoren berücksichtigt werden.
+总体来看，这个文档详细描述了`df-lexvance-compliance-tracker`的功能架构及其在整个合规检查自动化系统中的位置。它不仅强调了自动化的重要性，而且对具体操作流程、测试方法以及安全措施进行了详尽说明，为该项目的实际应用奠定了基础。
