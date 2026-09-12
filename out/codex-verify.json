@@ -1,0 +1,6 @@
+{
+  "verdict": "HOLDS",
+  "reason": "Der Test speist echte compliant vs. adversarial Evidence durch den Dispatcher im Real-Modus und verlangt andere Findings, Risk-Score, Risk-Class und Eskalation statt nur Konstanten oder Mocks zu vergleichen.",
+  "ts": "2026-09-11T22:28:09.814436+00:00",
+  "attempts": 1
+}
